@@ -1,3 +1,4 @@
+import selenium
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
@@ -5,6 +6,20 @@ from time import sleep
 import json
 import datetime
 
+# this stuff is for chrome specifically, copy pasted from
+# https://sites.google.com/a/chromium.org/chromedriver/getting-started
+import time
+from selenium.webdriver.chrome.service import Service
+
+#  path to chromedriver
+service = Service('C:/Users/Bibian/chromedriver_win32')
+service.start()
+# https://stackoverflow.com/questions/47148872/webdrivers-executable-may-have-wrong-permissions-please-see-https-sites-g
+driver = webdriver.Chrome('C:/Users/Bibian/chromedriver_win32/chromedriver.exe')
+
+driver.get('http://www.google.com/')
+time.sleep(5)  # Let the user actually see something!
+driver.quit()
 
 # edit these three variables
 user = 'realdonaldtrump'
@@ -13,8 +28,6 @@ end = datetime.datetime(2016, 12, 7)  # year, month, day
 
 # only edit these if you're having problems
 delay = 1  # time to wait on each page load before reading the page
-driver = webdriver.Safari()  # options are Chrome() Firefox() Safari()
-
 
 # don't mess with this stuff
 twitter_ids_filename = 'all_ids.json'
@@ -24,19 +37,23 @@ tweet_selector = 'li.js-stream-item'
 user = user.lower()
 ids = []
 
+
 def format_day(date):
     day = '0' + str(date.day) if len(str(date.day)) == 1 else str(date.day)
     month = '0' + str(date.month) if len(str(date.month)) == 1 else str(date.month)
     year = str(date.year)
     return '-'.join([year, month, day])
 
+
 def form_url(since, until):
     p1 = 'https://twitter.com/search?f=tweets&vertical=default&q=from%3A'
-    p2 =  user + '%20since%3A' + since + '%20until%3A' + until + 'include%3Aretweets&src=typd'
+    p2 = user + '%20since%3A' + since + '%20until%3A' + until + 'include%3Aretweets&src=typd'
     return p1 + p2
+
 
 def increment_day(date, i):
     return date + datetime.timedelta(days=i)
+
 
 for day in range(days):
     d1 = format_day(increment_day(start, 0))
@@ -71,7 +88,6 @@ for day in range(days):
         print('no tweets on this day')
 
     start = increment_day(start, 1)
-
 
 try:
     with open(twitter_ids_filename) as f:
